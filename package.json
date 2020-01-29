@@ -1,0 +1,23 @@
+{
+  "name": "note-taker",
+  "version": "1.0.0",
+  "description": "App for creating and saving notes",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bferriman/note-taker.git"
+  },
+  "author": "Ben Ferriman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bferriman/note-taker/issues"
+  },
+  "homepage": "https://github.com/bferriman/note-taker#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
