@@ -5,7 +5,6 @@ const util = require("util");
 
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
-const appendFileAsync = util.promisify(fs.appendFile);
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -17,17 +16,17 @@ let nextID = 0;
 
 async function setID() {
   return new Promise( (resolve, reject) => {
-    console.log("looking for existing ids");
     fs.readFile("./db.json", "utf8", (err, data) => {
       if (err) {
-        console.log(err);
         return reject(err);
       }
-      console.log(data);
-      console.log(JSON.parse(data));
       let jsonData = JSON.parse(data);
-      nextID = jsonData[jsonData.length - 1].id + 1;
-      console.log("Set nextID to" + nextID);
+      if(jsonData.length === 0) {
+        nextID = 1;
+      }
+      else{
+        nextID = jsonData[jsonData.length - 1].id + 1;
+      }
       resolve();
     });
   });
@@ -64,7 +63,8 @@ app.get("/assets/js/index.js", (req, res) => {
 app.get("/api/notes", async (req, res) => {
   console.log("GET request received at /api/notes");
   try{
-    const data = await readFileAsync("./db.json", "utf8");
+    const dataStr = await readFileAsync("./db.json", "utf8");
+    const data = JSON.parse(dataStr);
     return res.json(data);
   }
   catch(err) {
@@ -78,7 +78,11 @@ app.post("/api/notes", async (req, res) => {
   let newNote = req.body;
   newNote.id = getID();
   try{
-    await appendFileAsync("./db.json", JSON.stringify(newNote));
+    let notesStr = await readFileAsync("./db.json", "utf8");
+    const notes = JSON.parse(notesStr);
+    notes.push(newNote);
+    notesStr = JSON.stringify(notes);
+    await writeFileAsync("./db.json", notesStr);
     return res.json(newNote);
   }
   catch(err) {
@@ -87,11 +91,12 @@ app.post("/api/notes", async (req, res) => {
   }
 });
 
-app.delete("/api/notes:id", async (req, res) => {
+app.delete("/api/notes/:id", async (req, res) => {
   console.log("DELETE request received at /api/notes:id");
-  const target = req.params.id;
+  const target = parseInt(req.params.id);
   try{
-    const data = await readFileAsync("./db.json", "utf8");
+    let dataStr = await readFileAsync("./db.json", "utf8");
+    const data = JSON.parse(dataStr);
     //find index of the target note
     let targetIndex = null;
     for(let i = 0; i < data.length; i++) {
@@ -103,7 +108,8 @@ app.delete("/api/notes:id", async (req, res) => {
     if(targetIndex !== null) {
       data.splice(targetIndex, 1);
     }
-    await writeFileAsync("./db.json", data);
+    dataStr = JSON.stringify(data);
+    await writeFileAsync("./db.json", dataStr);
     res.sendStatus(200);
   }
   catch(err) {
