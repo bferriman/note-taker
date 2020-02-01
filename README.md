@@ -4,6 +4,8 @@
 
 In this project I created server.js to provide a back end for pre-existing front end code and complete a note taking application that keeps notes stored on a server.  The server stores notes in a JSON file.  The user can create notes, retrieve previously created notes, and delete notes that are no longer needed.
 
+Deployed at: [Heroku](https://secret-savannah-63062.herokuapp.com/).
+
 ## Credits
 
 Front end code provided by Trilogy Education Services, a 2U, Inc. brand.
